@@ -128,31 +128,61 @@ jobs:
     - name: Download dependencies
       run: go mod download
 
+    - name: Install kustomize
+      run: |
+        curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
+        sudo mv kustomize /usr/local/bin/
+
     - name: Generate manifests
       run: |
         make manifests
         
-        # Update image tag in deployment
-        sed -i "s|image: .*|image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.release.outputs.tag_name }}|" config/manager/manager.yaml
-        
-        # Create combined manifest
+        # Create release manifests directory
         mkdir -p release-manifests
         
-        # Combine all manifests into a single file
+        # Generate a clean, deployable manifest using kustomize
+        cd config/manager && kustomize edit set image controller=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.release.outputs.tag_name }}
+        cd ../..
+        
+        # Create combined manifest using kustomize
         echo "# Digicloud Issuer - ${{ needs.release.outputs.tag_name }}" > release-manifests/digicloud-issuer.yaml
         echo "# Generated on $(date)" >> release-manifests/digicloud-issuer.yaml
         echo "---" >> release-manifests/digicloud-issuer.yaml
         
-        # Add CRDs
-        cat config/crd/bases/*.yaml >> release-manifests/digicloud-issuer.yaml
+        # Add CRDs first
+        for crd in config/crd/bases/*.yaml; do
+          if [ -f "$crd" ]; then
+            cat "$crd" >> release-manifests/digicloud-issuer.yaml
+            echo "---" >> release-manifests/digicloud-issuer.yaml
+          fi
+        done
+        
+        # Add namespace
+        echo "apiVersion: v1" >> release-manifests/digicloud-issuer.yaml
+        echo "kind: Namespace" >> release-manifests/digicloud-issuer.yaml
+        echo "metadata:" >> release-manifests/digicloud-issuer.yaml
+        echo "  name: digicloud-issuer-system" >> release-manifests/digicloud-issuer.yaml
         echo "---" >> release-manifests/digicloud-issuer.yaml
         
-        # Add RBAC
-        cat config/rbac/*.yaml >> release-manifests/digicloud-issuer.yaml
-        echo "---" >> release-manifests/digicloud-issuer.yaml
+        # Add RBAC resources (excluding kustomization files)
+        for rbac in config/rbac/*.yaml; do
+          if [ -f "$rbac" ] && [[ ! "$rbac" =~ kustomization\.yaml$ ]]; then
+            cat "$rbac" >> release-manifests/digicloud-issuer.yaml
+            echo "---" >> release-manifests/digicloud-issuer.yaml
+          fi
+        done
         
-        # Add manager
-        cat config/manager/*.yaml >> release-manifests/digicloud-issuer.yaml
+        # Add manager deployment (excluding kustomization files)
+        for manager in config/manager/*.yaml; do
+          if [ -f "$manager" ] && [[ ! "$manager" =~ kustomization\.yaml$ ]]; then
+            # Update the image tag
+            sed "s|image: .*|image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ needs.release.outputs.tag_name }}|" "$manager" >> release-manifests/digicloud-issuer.yaml
+            echo "---" >> release-manifests/digicloud-issuer.yaml
+          fi
+        done
+        
+        # Remove the last separator
+        sed -i '$ { /^---$/d; }' release-manifests/digicloud-issuer.yaml
         
         # Create tarball
         tar -czf digicloud-issuer-${{ needs.release.outputs.tag_name }}.tar.gz -C release-manifests .
