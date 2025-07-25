@@ -24,7 +24,7 @@ go.work.sum
 # vendor/
 
 # Go modules download cache
-go.sum
+# Note: go.sum should be committed to version control
 
 # IDE files
 .vscode/
