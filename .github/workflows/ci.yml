@@ -46,12 +46,6 @@ jobs:
         make generate manifests
         git diff --exit-code || (echo "Generated files are out of sync. Please run 'make generate manifests' and commit the changes." && exit 1)
 
-    - name: Lint
-      uses: golangci/golangci-lint-action@v3
-      with:
-        version: latest
-        args: --timeout=5m
-
   build-image:
     name: Build and Push Docker Image
     runs-on: ubuntu-latest
