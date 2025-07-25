@@ -34,7 +34,7 @@ func TestDigicloudProvider_Present(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			provider := NewDigicloudProvider("https://api.digicloud.ir", "test-token", "default", 300)
-			
+
 			err := provider.Present(tt.domain, tt.token, tt.keyAuth)
 
 			if tt.expectError {
@@ -75,7 +75,7 @@ func TestDigicloudProvider_CleanUp(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			provider := NewDigicloudProvider("https://api.digicloud.ir", "test-token", "default", 300)
-			
+
 			err := provider.CleanUp(tt.domain, tt.token, tt.keyAuth)
 
 			if tt.expectError {
@@ -92,7 +92,7 @@ func TestDigicloudProvider_CleanUp(t *testing.T) {
 func TestDigicloudProvider_Timeout(t *testing.T) {
 	provider := NewDigicloudProvider("https://api.digicloud.ir", "test-token", "default", 300)
 	timeout, interval := provider.Timeout()
-	
+
 	// Should return reasonable timeout and interval
 	assert.True(t, timeout > 0)
 	assert.True(t, timeout <= 5*time.Minute)
@@ -102,7 +102,7 @@ func TestDigicloudProvider_Timeout(t *testing.T) {
 
 func TestNewDigicloudProvider(t *testing.T) {
 	provider := NewDigicloudProvider("https://api.digicloud.ir", "test-token", "default", 300)
-	
+
 	assert.NotNil(t, provider)
 	assert.Equal(t, "https://api.digicloud.ir", provider.baseURL)
 	assert.Equal(t, "test-token", provider.apiToken)

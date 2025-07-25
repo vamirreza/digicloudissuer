@@ -16,31 +16,6 @@ rules:
   - digicloud.issuer.vamirreza.github.io
   resources:
   - digicloudclusterissuers
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - digicloud.issuer.vamirreza.github.io
-  resources:
-  - digicloudclusterissuers/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - digicloud.issuer.vamirreza.github.io
-  resources:
-  - digicloudclusterissuers/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - digicloud.issuer.vamirreza.github.io
-  resources:
   - digicloudissuers
   verbs:
   - create
@@ -53,12 +28,14 @@ rules:
 - apiGroups:
   - digicloud.issuer.vamirreza.github.io
   resources:
+  - digicloudclusterissuers/finalizers
   - digicloudissuers/finalizers
   verbs:
   - update
 - apiGroups:
   - digicloud.issuer.vamirreza.github.io
   resources:
+  - digicloudclusterissuers/status
   - digicloudissuers/status
   verbs:
   - get

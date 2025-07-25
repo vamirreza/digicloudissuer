@@ -16,9 +16,10 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+	"sigs.k8s.io/controller-runtime/pkg/metrics/server"
 
-	cmapi "github.com/cert-manager/cert-manager/pkg/apis/certmanager/v1"
 	cmacme "github.com/cert-manager/cert-manager/pkg/apis/acme/v1"
+	cmapi "github.com/cert-manager/cert-manager/pkg/apis/certmanager/v1"
 
 	"github.com/vamirreza/digicloud-issuer/api/v1alpha1"
 	"github.com/vamirreza/digicloud-issuer/internal/controllers"
@@ -66,8 +67,10 @@ var _ = BeforeSuite(func() {
 
 	// Start the manager
 	mgr, err := ctrl.NewManager(cfg, ctrl.Options{
-		Scheme:             scheme.Scheme,
-		MetricsBindAddress: "0",
+		Scheme: scheme.Scheme,
+		Metrics: server.Options{
+			BindAddress: "0",
+		},
 	})
 	Expect(err).ToNot(HaveOccurred())
 
@@ -99,27 +102,27 @@ var _ = AfterSuite(func() {
 
 var _ = Describe("DigicloudIssuer", func() {
 	var (
-		namespace   string
-		issuerName  string
-		issuer      *v1alpha1.DigicloudIssuer
+		namespace  string
+		issuerName string
+		issuer     *v1alpha1.DigicloudIssuer
 	)
 
 	BeforeEach(func() {
 		namespace = "default"
 		issuerName = "test-issuer-" + time.Now().Format("20060102150405")
-		
+
 		issuer = &v1alpha1.DigicloudIssuer{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      issuerName,
 				Namespace: namespace,
 			},
 			Spec: v1alpha1.DigicloudIssuerSpec{
-				APIEndpoint: "https://api.digicloud.ir",
-				APIKey: v1alpha1.SecretKeySelector{
-					LocalObjectReference: v1alpha1.LocalObjectReference{
+				Provisioner: v1alpha1.DigicloudIssuerProvisioner{
+					APIBaseURL: "https://api.digicloud.ir",
+					APITokenSecretRef: v1alpha1.SecretKeySelector{
 						Name: "api-key-secret",
+						Key:  "api-key",
 					},
-					Key: "api-key",
 				},
 			},
 		}
@@ -135,8 +138,8 @@ var _ = Describe("DigicloudIssuer", func() {
 				return k8sClient.Get(ctx, client.ObjectKeyFromObject(issuer), createdIssuer)
 			}, time.Second*10, time.Millisecond*250).Should(Succeed())
 
-			Expect(createdIssuer.Spec.APIEndpoint).To(Equal("https://api.digicloud.ir"))
-			Expect(createdIssuer.Spec.APIKey.Name).To(Equal("api-key-secret"))
+			Expect(createdIssuer.Spec.Provisioner.APIBaseURL).To(Equal("https://api.digicloud.ir"))
+			Expect(createdIssuer.Spec.Provisioner.APITokenSecretRef.Name).To(Equal("api-key-secret"))
 		})
 
 		It("Should be deletable", func() {
@@ -155,24 +158,24 @@ var _ = Describe("DigicloudIssuer", func() {
 
 var _ = Describe("DigicloudClusterIssuer", func() {
 	var (
-		clusterIssuerName  string
-		clusterIssuer      *v1alpha1.DigicloudClusterIssuer
+		clusterIssuerName string
+		clusterIssuer     *v1alpha1.DigicloudClusterIssuer
 	)
 
 	BeforeEach(func() {
 		clusterIssuerName = "test-cluster-issuer-" + time.Now().Format("20060102150405")
-		
+
 		clusterIssuer = &v1alpha1.DigicloudClusterIssuer{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: clusterIssuerName,
 			},
-			Spec: v1alpha1.DigicloudIssuerSpec{
-				APIEndpoint: "https://api.digicloud.ir",
-				APIKey: v1alpha1.SecretKeySelector{
-					LocalObjectReference: v1alpha1.LocalObjectReference{
+			Spec: v1alpha1.DigicloudClusterIssuerSpec{
+				Provisioner: v1alpha1.DigicloudIssuerProvisioner{
+					APIBaseURL: "https://api.digicloud.ir",
+					APITokenSecretRef: v1alpha1.SecretKeySelector{
 						Name: "api-key-secret",
+						Key:  "api-key",
 					},
-					Key: "api-key",
 				},
 			},
 		}
@@ -188,8 +191,13 @@ var _ = Describe("DigicloudClusterIssuer", func() {
 				return k8sClient.Get(ctx, client.ObjectKeyFromObject(clusterIssuer), createdClusterIssuer)
 			}, time.Second*10, time.Millisecond*250).Should(Succeed())
 
-			Expect(createdClusterIssuer.Spec.APIEndpoint).To(Equal("https://api.digicloud.ir"))
-			Expect(createdClusterIssuer.Spec.APIKey.Name).To(Equal("api-key-secret"))
+			Expect(createdClusterIssuer.Spec.Provisioner.APIBaseURL).To(Equal("https://api.digicloud.ir"))
+			Expect(createdClusterIssuer.Spec.Provisioner.APITokenSecretRef.Name).To(Equal("api-key-secret"))
+		})
+
+		AfterEach(func() {
+			// Clean up the cluster issuer
+			Expect(k8sClient.Delete(ctx, clusterIssuer)).Should(Succeed())
 		})
 	})
 })
