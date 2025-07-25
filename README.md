@@ -34,7 +34,7 @@ kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/
 ### 2. Install Digicloud Issuer
 
 ```bash
-kubectl apply -f https://github.com/digicloud/digicloud-issuer/releases/latest/download/install.yaml
+kubectl apply -f https://github.com/vamirreza/digicloud-issuer/releases/latest/download/digicloud-issuer.yaml
 ```
 
 ### 3. Create API Credentials Secret
@@ -54,7 +54,7 @@ kubectl create secret generic digicloud-credentials \
 Create a namespace-scoped issuer:
 
 ```yaml
-apiVersion: digicloud.io/v1alpha1
+apiVersion: digicloud.issuer.vamirreza.github.io/v1alpha1
 kind: DigicloudIssuer
 metadata:
   name: digicloud-issuer
@@ -73,7 +73,7 @@ spec:
 Create a cluster-scoped issuer:
 
 ```yaml
-apiVersion: digicloud.io/v1alpha1
+apiVersion: digicloud.issuer.vamirreza.github.io/v1alpha1
 kind: DigicloudClusterIssuer
 metadata:
   name: digicloud-cluster-issuer
@@ -98,7 +98,7 @@ spec:
   issuerRef:
     name: digicloud-issuer
     kind: DigicloudIssuer
-    group: digicloud.io
+    group: digicloud.issuer.vamirreza.github.io
   dnsNames:
   - example.com
   - www.example.com
@@ -117,7 +117,7 @@ metadata:
   annotations:
     cert-manager.io/issuer: "digicloud-issuer"
     cert-manager.io/issuer-kind: "DigicloudIssuer"
-    cert-manager.io/issuer-group: "digicloud.io"
+    cert-manager.io/issuer-group: "digicloud.issuer.vamirreza.github.io"
 spec:
   tls:
   - hosts:
@@ -222,7 +222,7 @@ make e2e
 DigicloudIssuer is a namespace-scoped resource for issuing certificates.
 
 ```yaml
-apiVersion: digicloud.io/v1alpha1
+apiVersion: digicloud.issuer.vamirreza.github.io/v1alpha1
 kind: DigicloudIssuer
 metadata:
   name: example-issuer
@@ -244,7 +244,7 @@ status:
 DigicloudClusterIssuer is a cluster-scoped resource for issuing certificates.
 
 ```yaml
-apiVersion: digicloud.io/v1alpha1
+apiVersion: digicloud.issuer.vamirreza.github.io/v1alpha1
 kind: DigicloudClusterIssuer
 metadata:
   name: example-cluster-issuer

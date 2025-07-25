@@ -273,6 +273,15 @@ func main() {
 		os.Exit(1)
 	}
 
+	if err = (&controllers.CertificateRequestReconciler{
+		Client:   mgr.GetClient(),
+		Scheme:   mgr.GetScheme(),
+		Recorder: mgr.GetEventRecorderFor("digicloud-issuer"),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create CertificateRequest controller")
+		os.Exit(1)
+	}
+
 	// +kubebuilder:scaffold:builder
 
 	if metricsCertWatcher != nil {

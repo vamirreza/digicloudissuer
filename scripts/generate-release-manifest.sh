@@ -57,8 +57,10 @@ done
 echo "Adding manager deployment..."
 for manager in config/manager/*.yaml; do
   if [ -f "$manager" ] && [[ ! "$manager" =~ kustomization\.yaml$ ]]; then
-    # Update the image tag
-    sed "s|image: .*|image: $REGISTRY/$IMAGE_NAME:$TAG|" "$manager" >> release-manifests/digicloud-issuer.yaml
+    # Update the image tag and fix namespace
+    sed -e "s|image: .*|image: $REGISTRY/$IMAGE_NAME:$TAG|" \
+        -e "s|namespace: system|namespace: digicloud-issuer-system|" \
+        "$manager" >> release-manifests/digicloud-issuer.yaml
     echo "---" >> release-manifests/digicloud-issuer.yaml
   fi
 done

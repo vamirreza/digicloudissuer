@@ -2,7 +2,7 @@ apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
   name: example-certificate
-  namespace: default
+  namespace: cert-manager
 spec:
   # The secret name where the certificate will be stored
   secretName: example-tls
@@ -14,21 +14,9 @@ spec:
     group: digicloud.issuer.vamirreza.github.io
   
   # Common name for the certificate
-  commonName: example.com
+  commonName: digicdn.io
   
   # DNS names for the certificate
   dnsNames:
-  - example.com
-  - www.example.com
-  - api.example.com
-  
-  # Use DNS01 challenges for domain validation
-  # This will automatically create DNS TXT records using the Digicloud API
-  acme:
-    config:
-    - dns01:
-        digicloud: {}
-      domains:
-      - example.com
-      - www.example.com
-      - api.example.com
+  - digicdn.io
+  - "*.digicdn.io"  # Wildcard subdomain support
