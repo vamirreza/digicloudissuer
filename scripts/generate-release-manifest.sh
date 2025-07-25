@@ -83,7 +83,11 @@ done
 echo "✅ Release manifest generated: release-manifests/digicloud-issuer.yaml"
 echo "📦 Validating manifest..."
 
-# Validate the manifest
-kubectl apply --dry-run=client -f release-manifests/digicloud-issuer.yaml
-
-echo "✅ Manifest validation successful!"
+# Validate the manifest (skip if no cluster available)
+if kubectl cluster-info >/dev/null 2>&1; then
+  kubectl apply --dry-run=client -f release-manifests/digicloud-issuer.yaml
+  echo "✅ Manifest validation successful!"
+else
+  echo "⚠️  No Kubernetes cluster available for validation - skipping validation step"
+  echo "✅ Manifest generation completed!"
+fi
