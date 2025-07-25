@@ -55,18 +55,30 @@ done
 
 # Add manager deployment (excluding kustomization files)
 echo "Adding manager deployment..."
-for manager in config/manager/*.yaml; do
+manager_files=(config/manager/*.yaml)
+last_manager_file=""
+
+# Find the last file that matches our criteria
+for manager in "${manager_files[@]}"; do
+  if [ -f "$manager" ] && [[ ! "$manager" =~ kustomization\.yaml$ ]]; then
+    last_manager_file="$manager"
+  fi
+done
+
+# Process manager files
+for manager in "${manager_files[@]}"; do
   if [ -f "$manager" ] && [[ ! "$manager" =~ kustomization\.yaml$ ]]; then
     # Update the image tag and fix namespace
     sed -e "s|image: .*|image: $REGISTRY/$IMAGE_NAME:$TAG|" \
         -e "s|namespace: system|namespace: digicloud-issuer-system|" \
         "$manager" >> release-manifests/digicloud-issuer.yaml
-    echo "---" >> release-manifests/digicloud-issuer.yaml
+    
+    # Only add separator if this is not the last file
+    if [ "$manager" != "$last_manager_file" ]; then
+      echo "---" >> release-manifests/digicloud-issuer.yaml
+    fi
   fi
 done
-
-# Remove the last separator if it exists
-sed -i '' '$ { /^---$/d; }' release-manifests/digicloud-issuer.yaml
 
 echo "✅ Release manifest generated: release-manifests/digicloud-issuer.yaml"
 echo "📦 Validating manifest..."
