@@ -17,11 +17,11 @@ resources:
 # [PROMETHEUS] To enable prometheus monitor, uncomment all sections with 'PROMETHEUS'.
 #- ../prometheus
 
-patchesStrategicMerge:
+# patchesStrategicMerge:
 # Protect the /metrics endpoint by putting it behind auth.
 # If you want your controller-manager to expose the /metrics
 # endpoint w/o any authn/z, please comment the following line.
-- manager_auth_proxy_patch.yaml
+#- manager_auth_proxy_patch.yaml
 
 # [WEBHOOK] To enable webhook, uncomment all the sections with [WEBHOOK] prefix including the one in
 # crd/kustomization.yaml
@@ -37,5 +37,5 @@ images:
 # [MANAGER] To enable manager image, uncomment all the sections with [MANAGER] prefix.
 # Specify what image to use for the manager from the Makefile
 - name: controller
-  newName: ghcr.io/vamirreza/digicloud-issuer
+  newName: digicloud-issuer
   newTag: latest
