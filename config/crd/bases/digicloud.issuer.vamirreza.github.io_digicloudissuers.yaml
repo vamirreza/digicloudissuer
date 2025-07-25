@@ -1,0 +1,143 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.13.0
+  name: digicloudissuers.digicloud.issuer.vamirreza.github.io
+spec:
+  group: digicloud.issuer.vamirreza.github.io
+  names:
+    kind: DigicloudIssuer
+    listKind: DigicloudIssuerList
+    plural: digicloudissuers
+    singular: digicloudissuer
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.conditions[?(@.type=="Ready")].status
+      name: Ready
+      type: string
+    - jsonPath: .status.conditions[?(@.type=="Ready")].reason
+      name: Reason
+      type: string
+    - jsonPath: .status.conditions[?(@.type=="Ready")].message
+      name: Message
+      type: string
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: DigicloudIssuer is the Schema for the digicloudissuers API
+        properties:
+          apiVersion:
+            description: 'APIVersion defines the versioned schema of this representation
+              of an object. Servers should convert recognized schemas to the latest
+              internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
+            type: string
+          kind:
+            description: 'Kind is a string value representing the REST resource this
+              object represents. Servers may infer this from the endpoint the client
+              submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: DigicloudIssuerSpec defines the desired state of DigicloudIssuer
+            properties:
+              provisioner:
+                description: Provisioner contains the provisioner configuration for
+                  the issuer
+                properties:
+                  apiBaseUrl:
+                    default: https://api.digicloud.ir
+                    description: APIBaseURL is the base URL for the Digicloud API
+                    type: string
+                  apiTokenSecretRef:
+                    description: APITokenSecretRef is a reference to a secret containing
+                      the Digicloud API token
+                    properties:
+                      key:
+                        description: Key is the key within the secret
+                        type: string
+                      name:
+                        description: Name is the name of the secret
+                        type: string
+                    required:
+                    - key
+                    - name
+                    type: object
+                  pollingInterval:
+                    default: 10s
+                    description: PollingInterval is the interval between DNS propagation
+                      checks
+                    type: string
+                  propagationTimeout:
+                    default: 5m
+                    description: PropagationTimeout is the maximum time to wait for
+                      DNS propagation
+                    type: string
+                  ttl:
+                    default: 300
+                    description: TTL is the time-to-live for DNS records in seconds
+                    maximum: 86400
+                    minimum: 60
+                    type: integer
+                required:
+                - apiTokenSecretRef
+                type: object
+            required:
+            - provisioner
+            type: object
+          status:
+            description: DigicloudIssuerStatus defines the observed state of DigicloudIssuer
+            properties:
+              conditions:
+                description: Conditions represent the latest available observations
+                  of the issuer's state
+                items:
+                  description: IssuerCondition contains condition information for
+                    an Issuer.
+                  properties:
+                    lastTransitionTime:
+                      description: LastTransitionTime is the timestamp corresponding
+                        to the last status change of this condition.
+                      format: date-time
+                      type: string
+                    message:
+                      description: Message is a human readable description of the
+                        details of the last transition, complementing reason.
+                      type: string
+                    observedGeneration:
+                      description: If set, this represents the .metadata.generation
+                        that the condition was set based upon. For instance, if .metadata.generation
+                        is currently 12, but the .status.condition[x].observedGeneration
+                        is 9, the condition is out of date with respect to the current
+                        state of the Issuer.
+                      format: int64
+                      type: integer
+                    reason:
+                      description: Reason is a brief machine readable explanation
+                        for the condition's last transition.
+                      type: string
+                    status:
+                      description: Status of the condition, one of (`True`, `False`,
+                        `Unknown`).
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      description: Type of the condition, known values are (`Ready`).
+                      type: string
+                  required:
+                  - status
+                  - type
+                  type: object
+                type: array
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}

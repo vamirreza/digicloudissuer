@@ -1,0 +1,56 @@
+name: Auto-update Dependencies
+
+on:
+  schedule:
+    - cron: '0 4 * * 1' # Weekly on Monday at 4 AM
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  update-dependencies:
+    name: Update Go Dependencies
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.21'
+
+    - name: Update dependencies
+      run: |
+        go get -u ./...
+        go mod tidy
+
+    - name: Test with updated dependencies
+      run: make test
+
+    - name: Check for changes
+      id: changes
+      run: |
+        if git diff --quiet go.mod go.sum; then
+          echo "changed=false" >> $GITHUB_OUTPUT
+        else
+          echo "changed=true" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Create Pull Request
+      if: steps.changes.outputs.changed == 'true'
+      uses: peter-evans/create-pull-request@v5
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        commit-message: 'chore: update Go dependencies'
+        title: 'chore: update Go dependencies'
+        body: |
+          Automated dependency update by GitHub Actions.
+          
+          Please review the changes and ensure all tests pass before merging.
+          
+          - Updated Go module dependencies
+          - Ran `go mod tidy`
+          - Tests passed with updated dependencies
+        branch: chore/update-dependencies
+        delete-branch: true

@@ -1,0 +1,17 @@
+linters:
+  enable:
+    - errcheck
+    - gofmt
+    - goimports
+    - gosec
+    - gosimple
+    - govet
+    - ineffassign
+    - misspell
+    - staticcheck
+    - typecheck
+    - unused
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0

@@ -1,0 +1,21 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- bases/digicloud.issuer.vamirreza.github.io_digicloudissuers.yaml
+- bases/digicloud.issuer.vamirreza.github.io_digicloudclusterissuers.yaml
+
+# +kubebuilder:scaffold:crdkustomizeresource
+
+patchesStrategicMerge:
+# [WEBHOOK] To enable webhook, uncomment all the sections with [WEBHOOK] prefix.
+# patches here are for enabling the conversion webhook for each CRD
+# +kubebuilder:scaffold:crdkustomizewebhookpatch
+
+# [CERTMANAGER] To enable cert-manager, uncomment all the sections with [CERTMANAGER] prefix.
+# patches here are for enabling the CA injection for each CRD
+# +kubebuilder:scaffold:crdkustomizecainjectionpatch
+
+# [ADMISSION WEBHOOK] To enable admission webhook, uncomment all the sections with [ADMISSION WEBHOOK] prefix.
+# patches here are for enabling the admission webhook for each CRD
+# +kubebuilder:scaffold:crdkustomizeadmissionwebhookpatch

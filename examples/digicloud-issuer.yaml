@@ -1,0 +1,23 @@
+apiVersion: digicloud.issuer.vamirreza.github.io/v1alpha1
+kind: DigicloudIssuer
+metadata:
+  name: digicloud-issuer
+  namespace: cert-manager
+spec:
+  provisioner:
+    # Optional: API base URL (defaults to https://api.digicloud.ir)
+    apiBaseUrl: "https://api.digicloud.ir"
+    
+    # Reference to secret containing API credentials
+    apiTokenSecretRef:
+      name: digicloud-credentials
+      key: token
+    
+    # Optional: TTL for DNS records in seconds (defaults to 300)
+    ttl: 300
+    
+    # Optional: Propagation timeout (defaults to 5m)
+    propagationTimeout: 5m
+    
+    # Optional: Polling interval (defaults to 10s)
+    pollingInterval: 10s

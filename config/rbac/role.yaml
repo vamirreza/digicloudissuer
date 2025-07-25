@@ -1,0 +1,66 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: manager-role
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - digicloud.issuer.vamirreza.github.io
+  resources:
+  - digicloudclusterissuers
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - digicloud.issuer.vamirreza.github.io
+  resources:
+  - digicloudclusterissuers/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - digicloud.issuer.vamirreza.github.io
+  resources:
+  - digicloudclusterissuers/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - digicloud.issuer.vamirreza.github.io
+  resources:
+  - digicloudissuers
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - digicloud.issuer.vamirreza.github.io
+  resources:
+  - digicloudissuers/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - digicloud.issuer.vamirreza.github.io
+  resources:
+  - digicloudissuers/status
+  verbs:
+  - get
+  - patch
+  - update
