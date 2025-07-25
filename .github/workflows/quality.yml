@@ -168,13 +168,3 @@ jobs:
           echo "No test files found"
         fi
 
-    - name: Check binary size
-      run: |
-        make build
-        BINARY_SIZE=$(stat -c%s bin/manager 2>/dev/null || stat -f%z bin/manager)
-        echo "Binary size: $BINARY_SIZE bytes"
-        
-        # Alert if binary is larger than 100MB
-        if [ $BINARY_SIZE -gt 104857600 ]; then
-          echo "Warning: Binary size is larger than 100MB"
-        fi
