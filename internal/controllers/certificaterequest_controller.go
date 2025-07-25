@@ -158,7 +158,7 @@ func (r *CertificateRequestReconciler) parseCSR(data []byte) (*x509.CertificateR
 
 // setStatus updates the CertificateRequest status
 func (r *CertificateRequestReconciler) setStatus(ctx context.Context, cr *cmapi.CertificateRequest, status cmmeta.ConditionStatus, reason, message string) {
-	now := metav1.NewTime(time.Now())
+	now := metav1.Now()
 	
 	// Find existing condition or create new one
 	var condition *cmapi.CertificateRequestCondition
@@ -172,10 +172,10 @@ func (r *CertificateRequestReconciler) setStatus(ctx context.Context, cr *cmapi.
 	if condition == nil {
 		// Add new condition
 		cr.Status.Conditions = append(cr.Status.Conditions, cmapi.CertificateRequestCondition{
-			Type:   cmapi.CertificateRequestConditionReady,
-			Status: status,
-			Reason: reason,
-			Message: message,
+			Type:               cmapi.CertificateRequestConditionReady,
+			Status:             status,
+			Reason:             reason,
+			Message:            message,
 			LastTransitionTime: &now,
 		})
 	} else {

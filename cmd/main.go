@@ -276,7 +276,7 @@ func main() {
 	if err = (&controllers.CertificateRequestReconciler{
 		Client:   mgr.GetClient(),
 		Scheme:   mgr.GetScheme(),
-		Recorder: mgr.GetEventRecorderFor("digicloud-issuer"),
+		Recorder: mgr.GetEventRecorderFor("certificaterequest-controller"),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create CertificateRequest controller")
 		os.Exit(1)
