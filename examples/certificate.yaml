@@ -1,7 +1,7 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: example-certificate
+  name: digicdn-io-certificate
   namespace: cert-manager
 spec:
   # The secret name where the certificate will be stored
