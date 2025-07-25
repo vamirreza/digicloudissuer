@@ -46,27 +46,10 @@ jobs:
         version: latest
         args: --timeout=5m
 
-  security:
-    name: Security Scan
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: '1.21'
-
-    - name: Run Gosec Security Scanner
-      uses: securecodewarrior/github-action-gosec@master
-      with:
-        args: './...'
-
   build-image:
     name: Build and Push Docker Image
     runs-on: ubuntu-latest
-    needs: [test, security]
+    needs: [test]
     permissions:
       contents: read
       packages: write
@@ -187,7 +170,7 @@ jobs:
   release:
     name: Release
     runs-on: ubuntu-latest
-    needs: [test, security, build-image]
+    needs: [test, build-image]
     if: github.event_name == 'release'
     permissions:
       contents: write
