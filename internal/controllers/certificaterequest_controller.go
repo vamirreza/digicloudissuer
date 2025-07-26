@@ -265,7 +265,7 @@ func (r *CertificateRequestReconciler) shouldCompleteValidation(cr *cmapi.Certif
 			condition.Reason == cmapi.CertificateRequestReasonPending &&
 			condition.LastTransitionTime != nil {
 			elapsed := time.Since(condition.LastTransitionTime.Time)
-			return elapsed > 2*time.Minute
+			return elapsed > 30*time.Second
 		}
 	}
 	return false
